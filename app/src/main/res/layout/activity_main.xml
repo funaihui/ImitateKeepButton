@@ -14,6 +14,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:content_text="签到"
+        app:circle_color="#00c5c5"
         android:id="@+id/imitateKeepButton"
         app:content_text_size="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,8 +22,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:radius="50dp"
-        app:narrow_down="5dp"
-        app:ring_size="15dp"
+        app:ring_bg_color="#afe1e1"
+        app:ring_color="#00c5c5"
+        app:narrow_down="10dp"
+        app:ring_size="10dp"
         app:space="1dp" />
 
 </android.support.constraint.ConstraintLayout>

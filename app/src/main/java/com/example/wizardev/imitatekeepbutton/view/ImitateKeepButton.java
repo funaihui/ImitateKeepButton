@@ -40,7 +40,7 @@ public class ImitateKeepButton extends View {
     private ColorStateList ringColor;
     private ColorStateList circleColor;
     private ColorStateList textColor;
-
+    private boolean enable = true;
     public ColorStateList getRingBgColor() {
         return ringBgColor;
     }
@@ -122,7 +122,6 @@ public class ImitateKeepButton extends View {
     private int value = 0;
     private float result;
     private ValueAnimator animatorValue;
-
     private OnViewClick onViewClick;
 
     public ImitateKeepButton(Context context) {
@@ -194,7 +193,6 @@ public class ImitateKeepButton extends View {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPaint.setColor(circleColor.getColorForState(getDrawableState(),0));
 
         circleLinePaint = new Paint();
 
@@ -223,7 +221,7 @@ public class ImitateKeepButton extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         //画圆
-        ringRadius = mRadius - DPUtils.dip2px(getContext(),value);
+        ringRadius = mRadius - DPUtils.dip2px(getContext(),value/2);
         mPaint.setColor(circleColor.getColorForState(getDrawableState(),0));
 
         canvas.drawCircle(getWidth() / 2, getHeight() / 2, ringRadius, mPaint);
@@ -250,65 +248,74 @@ public class ImitateKeepButton extends View {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(final MotionEvent event) {
+        if (!enable && event.getAction()!=MotionEvent.ACTION_UP) {
+            return false;
+        }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
-                if (animator != null) {
-                    animator.removeAllUpdateListeners();
-                }
-                animatorValue = ValueAnimator.ofInt(0, narrowDown);
-                animatorValue.setDuration(100);
-                animatorValue.setInterpolator(new LinearInterpolator());
-                animatorValue.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        value = (int) valueAnimator.getAnimatedValue();
-                        if (value == narrowDown) {
-                            startDrawLine = true;
-                            animatorValue.removeAllUpdateListeners();
-                        }
-                        postInvalidate();
-                    }
-                });
 
-                animatorValue.start();
-                angleAnimator = ValueAnimator.ofFloat(0, 360f);
-                angleAnimator.setDuration(3000);
-                angleAnimator.setInterpolator(new LinearInterpolator());
-                angleAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        angle = (float) valueAnimator.getAnimatedValue();
-                        if (angle == 360) {
-                            angleAnimator.removeAllUpdateListeners();
-                            onViewClick.onFinish(ImitateKeepButton.this);
-                        }
-                        postInvalidate();
+                    if (animator != null) {
+                        animator.removeAllUpdateListeners();
                     }
-                });
-                angleAnimator.start();
+                    animatorValue = ValueAnimator.ofInt(0, narrowDown);
+                    animatorValue.setDuration(100);
+                    animatorValue.setInterpolator(new LinearInterpolator());
+                    animatorValue.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                            value = (int) valueAnimator.getAnimatedValue();
+                            if (value == narrowDown) {
+                                startDrawLine = true;
+                                animatorValue.removeAllUpdateListeners();
+                            }
+                            postInvalidate();
+                        }
+                    });
+
+                    animatorValue.start();
+                    angleAnimator = ValueAnimator.ofFloat(0, 360f);
+                    angleAnimator.setDuration(2000);
+                    angleAnimator.setInterpolator(new LinearInterpolator());
+                    angleAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                            angle = (float) valueAnimator.getAnimatedValue();
+                            if (angle == 360) {
+                                angleAnimator.removeAllUpdateListeners();
+                                onViewClick.onFinish(ImitateKeepButton.this);
+
+                            }
+                            postInvalidate();
+                        }
+                    });
+                    angleAnimator.start();
             }
 
             break;
             case MotionEvent.ACTION_UP: {
-                angleAnimator.removeAllUpdateListeners();
-                animatorValue.removeAllUpdateListeners();
-                animator = ValueAnimator.ofInt(value,0);
-                animator.setDuration(300);
-                animator.setInterpolator(new LinearInterpolator());
-                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        value = (int) valueAnimator.getAnimatedValue();
-                        postInvalidate();
-                    }
-                });
-                animator.start();
+                restoreShape();
             }
             startDrawLine = false;
             break;
         }
         return true;
+    }
+
+    private void restoreShape() {
+        angleAnimator.removeAllUpdateListeners();
+        animatorValue.removeAllUpdateListeners();
+        animator = ValueAnimator.ofInt(value,0);
+        animator.setDuration(300);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                value = (int) valueAnimator.getAnimatedValue();
+                postInvalidate();
+            }
+        });
+        animator.start();
     }
 
     public interface OnViewClick{
@@ -317,5 +324,11 @@ public class ImitateKeepButton extends View {
 
     public void setOnViewClick(OnViewClick viewClick){
         this.onViewClick = viewClick;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+       // super.setEnabled(enabled);
+        this.enable = enabled;
     }
 }

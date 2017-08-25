@@ -1,6 +1,5 @@
 package com.example.wizardev.imitatekeepbutton;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -19,8 +18,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish(View view) {
                 Toast.makeText(MainActivity.this,"签到完成！",Toast.LENGTH_SHORT).show();
-                imitateKeepButton.setCircleColor(Color.GRAY);
+            //    imitateKeepButton.setCircleColor(Color.GRAY);
                 imitateKeepButton.setContentText("完成");
+               // imitateKeepButton.setEnabled(false);
             }
         });
     }
