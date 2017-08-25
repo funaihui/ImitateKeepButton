@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ImitateKeepButton">
+        <attr name="ring_bg_color" format="color|reference"/>
+        <attr name="ring_color" format="color|reference" />
+        <attr name="ring_size" format="dimension" />
+        <attr name="circle_color" format="color|reference" />
+        <attr name="content_text" format="string" />
+        <attr name="content_text_color" format="color|reference" />
+        <attr name="content_text_size" format="dimension" />
+        <attr name="radius" format="dimension" />
+        <attr name="space" format="dimension" />
+    </declare-styleable>
+</resources>
