@@ -10,5 +10,6 @@
         <attr name="content_text_size" format="dimension" />
         <attr name="radius" format="dimension" />
         <attr name="space" format="dimension" />
+        <attr name="narrow_down" format="dimension" />
     </declare-styleable>
 </resources>

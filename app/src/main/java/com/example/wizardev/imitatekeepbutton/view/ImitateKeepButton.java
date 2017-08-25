@@ -11,13 +11,12 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-import android.widget.Toast;
 
 import com.example.wizardev.imitatekeepbutton.R;
+import com.example.wizardev.imitatekeepbutton.util.DPUtils;
 
 /**
  * author : wizardev
@@ -30,7 +29,6 @@ public class ImitateKeepButton extends View {
     private Paint mPaint;
     private Paint textPaint;
     private int mRadius = 200;
-    private float scale = 1;
     private Paint circleLinePaint;
     private Paint arcPaint;
     private boolean startDrawLine = false;
@@ -42,12 +40,90 @@ public class ImitateKeepButton extends View {
     private ColorStateList ringColor;
     private ColorStateList circleColor;
     private ColorStateList textColor;
+
+    public ColorStateList getRingBgColor() {
+        return ringBgColor;
+    }
+
+    public void setRingBgColor(ColorStateList ringBgColor) {
+        this.ringBgColor = ringBgColor;
+    }
+
+    public ColorStateList getRingColor() {
+        return ringColor;
+    }
+
+    public void setRingColor(ColorStateList ringColor) {
+        this.ringColor = ringColor;
+    }
+
+    public ColorStateList getCircleColor() {
+        return circleColor;
+    }
+
+    public void setCircleColor(int circleColor) {
+
+        this.circleColor = ColorStateList.valueOf(circleColor);
+    }
+
+
+
+    public void setTextColor(ColorStateList textColor) {
+        this.textColor = textColor;
+    }
+
+    public String getContentText() {
+        return contentText;
+    }
+
+    public void setContentText(String contentText) {
+        this.contentText = contentText;
+    }
+
+    public int getTextSize() {
+        return textSize;
+    }
+
+    public void setTextSize(int textSize) {
+        this.textSize = textSize;
+    }
+
+    public int getRingSize() {
+        return ringSize;
+    }
+
+    public void setRingSize(int ringSize) {
+        this.ringSize = ringSize;
+    }
+
+    public int getRingRadius() {
+        return ringRadius;
+    }
+
+    public void setRingRadius(int ringRadius) {
+        this.ringRadius = ringRadius;
+    }
+
+    public int getNarrowDown() {
+        return narrowDown;
+    }
+
+    public void setNarrowDown(int narrowDown) {
+        this.narrowDown = narrowDown;
+    }
+
     private String contentText;
     private int textSize;
     private ValueAnimator animator;
     private int ringSize;
     private int ringRadius;
     private int space;
+    private int narrowDown;
+    private int value = 0;
+    private float result;
+    private ValueAnimator animatorValue;
+
+    private OnViewClick onViewClick;
 
     public ImitateKeepButton(Context context) {
         this(context, null);
@@ -69,6 +145,7 @@ public class ImitateKeepButton extends View {
         textSize = array.getDimensionPixelSize(R.styleable.ImitateKeepButton_content_text_size, textSize);
         ringSize = array.getDimensionPixelSize(R.styleable.ImitateKeepButton_ring_size, 10);
         space = array.getDimensionPixelSize(R.styleable.ImitateKeepButton_space, 0);
+        narrowDown = array.getDimensionPixelSize(R.styleable.ImitateKeepButton_narrow_down, 10);
 
         array.recycle();
         initAttributes();
@@ -80,10 +157,10 @@ public class ImitateKeepButton extends View {
         ringBgColor = (ringBgColor != null) ? ringBgColor : ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary));
         ringColor = (ringColor != null) ? ringColor : ColorStateList.valueOf(getResources().getColor(R.color.colorPrimaryDark));
         circleColor = (circleColor != null) ? circleColor : ColorStateList.valueOf(getResources().getColor(R.color.colorAccent));
+        textColor = (textColor != null) ? textColor : ColorStateList.valueOf(Color.WHITE);
         contentText = (contentText != null) ? contentText : "";
 
-        Log.i(TAG, "space: "+space);
-        ringRadius = mRadius+ space;
+        ringRadius = mRadius;
     }
 
     @Override
@@ -115,9 +192,9 @@ public class ImitateKeepButton extends View {
     //初始化画笔及路径
     private void initPaintOrPath() {
         mPaint = new Paint();
-        mPaint.setColor(circleColor.getColorForState(getDrawableState(),0));
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mPaint.setColor(circleColor.getColorForState(getDrawableState(),0));
 
         circleLinePaint = new Paint();
 
@@ -131,12 +208,13 @@ public class ImitateKeepButton extends View {
         arcPaint.setAntiAlias(true);
         arcPaint.setStrokeWidth(ringSize);
         arcPaint.setStyle(Paint.Style.STROKE);
+
         path = new Path();
 
         textPaint = new Paint();
         textPaint.setAntiAlias(true);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setColor(Color.WHITE);
+        textPaint.setColor(textColor.getColorForState(getDrawableState(),0));
         textPaint.setTextSize(textSize);
 
     }
@@ -144,23 +222,31 @@ public class ImitateKeepButton extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.save();
-        //计算画路径的矩形
-        RectF rect = new RectF(getWidth()/2-ringRadius,getHeight()/2-ringRadius,
-                getWidth()/2+ringRadius,getHeight()/2+ringRadius);
+        //画圆
+        ringRadius = mRadius - DPUtils.dip2px(getContext(),value);
+        mPaint.setColor(circleColor.getColorForState(getDrawableState(),0));
 
-
-        canvas.scale(scale,scale,getWidth()/2,getHeight()/2);
-        canvas.drawCircle(getWidth() / 2, getHeight() / 2, mRadius, mPaint);
+        canvas.drawCircle(getWidth() / 2, getHeight() / 2, ringRadius, mPaint);
+        //用户按键时开始画圆环
         if (startDrawLine){
-            canvas.restore();
-            canvas.drawCircle(getWidth() / 2, getHeight() / 2, ringRadius, circleLinePaint);
+            //计算外环的半径，记得要减去外环的宽度的一半
+            result = ringRadius + space +ringSize/2;
+            //画完整的进度条
+            canvas.drawCircle(getWidth() / 2, getHeight() / 2, result, circleLinePaint);
+           //画进度条路径
             path.reset();
+            //计算画路径的矩形
+            float left = getWidth()/2-result;
+            float top = getHeight()/2-result;
+            float right = getWidth()/2+result;
+            float bottom = getHeight()/2+result;
+            RectF rect = new RectF(left,top, right ,bottom);
             path.addArc(rect, -90, angle);
+
+            //画圆环的路径
             canvas.drawPath(path,arcPaint);
         }
         canvas.drawText(contentText,getWidth()/2,getHeight()/2,textPaint);
-
     }
 
     @Override
@@ -170,18 +256,22 @@ public class ImitateKeepButton extends View {
                 if (animator != null) {
                     animator.removeAllUpdateListeners();
                 }
-                ValueAnimator animator = ValueAnimator.ofFloat(1, 0.9f);
-                animator.setDuration(10);
-                animator.setInterpolator(new LinearInterpolator());
-                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                animatorValue = ValueAnimator.ofInt(0, narrowDown);
+                animatorValue.setDuration(100);
+                animatorValue.setInterpolator(new LinearInterpolator());
+                animatorValue.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        scale = (float) valueAnimator.getAnimatedValue();
+                        value = (int) valueAnimator.getAnimatedValue();
+                        if (value == narrowDown) {
+                            startDrawLine = true;
+                            animatorValue.removeAllUpdateListeners();
+                        }
                         postInvalidate();
                     }
                 });
 
-                animator.start();
+                animatorValue.start();
                 angleAnimator = ValueAnimator.ofFloat(0, 360f);
                 angleAnimator.setDuration(3000);
                 angleAnimator.setInterpolator(new LinearInterpolator());
@@ -191,26 +281,25 @@ public class ImitateKeepButton extends View {
                         angle = (float) valueAnimator.getAnimatedValue();
                         if (angle == 360) {
                             angleAnimator.removeAllUpdateListeners();
-                            Toast.makeText(getContext(),"签到完成！",Toast.LENGTH_SHORT).show();
+                            onViewClick.onFinish(ImitateKeepButton.this);
                         }
                         postInvalidate();
                     }
                 });
                 angleAnimator.start();
-                startDrawLine = true;
             }
 
             break;
             case MotionEvent.ACTION_UP: {
                 angleAnimator.removeAllUpdateListeners();
-                angle=0;
-                animator = ValueAnimator.ofFloat(scale,1);
+                animatorValue.removeAllUpdateListeners();
+                animator = ValueAnimator.ofInt(value,0);
                 animator.setDuration(300);
                 animator.setInterpolator(new LinearInterpolator());
                 animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        scale = (float) valueAnimator.getAnimatedValue();
+                        value = (int) valueAnimator.getAnimatedValue();
                         postInvalidate();
                     }
                 });
@@ -220,5 +309,13 @@ public class ImitateKeepButton extends View {
             break;
         }
         return true;
+    }
+
+    public interface OnViewClick{
+        void onFinish(View view);
+    }
+
+    public void setOnViewClick(OnViewClick viewClick){
+        this.onViewClick = viewClick;
     }
 }
