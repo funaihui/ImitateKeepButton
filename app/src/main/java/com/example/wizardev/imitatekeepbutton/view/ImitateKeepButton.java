@@ -41,77 +41,6 @@ public class ImitateKeepButton extends View {
     private ColorStateList circleColor;
     private ColorStateList textColor;
     private boolean enable = true;
-    public ColorStateList getRingBgColor() {
-        return ringBgColor;
-    }
-
-    public void setRingBgColor(ColorStateList ringBgColor) {
-        this.ringBgColor = ringBgColor;
-    }
-
-    public ColorStateList getRingColor() {
-        return ringColor;
-    }
-
-    public void setRingColor(ColorStateList ringColor) {
-        this.ringColor = ringColor;
-    }
-
-    public ColorStateList getCircleColor() {
-        return circleColor;
-    }
-
-    public void setCircleColor(int circleColor) {
-
-        this.circleColor = ColorStateList.valueOf(circleColor);
-    }
-
-
-
-    public void setTextColor(ColorStateList textColor) {
-        this.textColor = textColor;
-    }
-
-    public String getContentText() {
-        return contentText;
-    }
-
-    public void setContentText(String contentText) {
-        this.contentText = contentText;
-    }
-
-    public int getTextSize() {
-        return textSize;
-    }
-
-    public void setTextSize(int textSize) {
-        this.textSize = textSize;
-    }
-
-    public int getRingSize() {
-        return ringSize;
-    }
-
-    public void setRingSize(int ringSize) {
-        this.ringSize = ringSize;
-    }
-
-    public int getRingRadius() {
-        return ringRadius;
-    }
-
-    public void setRingRadius(int ringRadius) {
-        this.ringRadius = ringRadius;
-    }
-
-    public int getNarrowDown() {
-        return narrowDown;
-    }
-
-    public void setNarrowDown(int narrowDown) {
-        this.narrowDown = narrowDown;
-    }
-
     private String contentText;
     private int textSize;
     private ValueAnimator animator;
@@ -259,7 +188,7 @@ public class ImitateKeepButton extends View {
                         animator.removeAllUpdateListeners();
                     }
                     animatorValue = ValueAnimator.ofInt(0, narrowDown);
-                    animatorValue.setDuration(100);
+                    animatorValue.setDuration(50);
                     animatorValue.setInterpolator(new LinearInterpolator());
                     animatorValue.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
@@ -330,5 +259,14 @@ public class ImitateKeepButton extends View {
     public void setEnabled(boolean enabled) {
        // super.setEnabled(enabled);
         this.enable = enabled;
+    }
+
+    public void setContentText(String contentText) {
+        this.contentText = contentText;
+    }
+    //设置背景颜色
+    public void setCircleColor(int circleColor) {
+
+        this.circleColor = ColorStateList.valueOf(circleColor);
     }
 }
