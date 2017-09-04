@@ -18,9 +18,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish(View view) {
                 Toast.makeText(MainActivity.this,"签到完成！",Toast.LENGTH_SHORT).show();
-            //    imitateKeepButton.setCircleColor(Color.GRAY);
+
                 imitateKeepButton.setContentText("完成");
-               // imitateKeepButton.setEnabled(false);
+
             }
         });
     }

@@ -21,7 +21,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius="50dp"
+        app:radius="80dp"
         app:ring_bg_color="#afe1e1"
         app:ring_color="#00c5c5"
         app:narrow_down="10dp"

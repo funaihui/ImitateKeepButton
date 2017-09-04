@@ -177,12 +177,12 @@ public class ImitateKeepButton extends View {
         }
         if (widthMode == MeasureSpec.AT_MOST) {
             int contentWidth =  (mRadius + space + ringSize)*2+ getPaddingLeft() + getPaddingRight();
-            resultWidth = (contentWidth < widthSize) ? resultWidth : contentWidth;
+            resultWidth = (contentWidth < widthSize) ? contentWidth : resultWidth;
         }
 
         if (heightMode == MeasureSpec.AT_MOST) {
             int contentHeight = (mRadius + space + ringSize)*2 + getPaddingTop() + getPaddingBottom();
-            resultHeight = (contentHeight < heightSize) ? resultHeight : contentHeight;
+            resultHeight = (contentHeight < heightSize) ? contentHeight : resultHeight;
         }
 
         setMeasuredDimension(resultWidth,resultHeight);
@@ -259,7 +259,7 @@ public class ImitateKeepButton extends View {
                         animator.removeAllUpdateListeners();
                     }
                     animatorValue = ValueAnimator.ofInt(0, narrowDown);
-                    animatorValue.setDuration(100);
+                    animatorValue.setDuration(50);
                     animatorValue.setInterpolator(new LinearInterpolator());
                     animatorValue.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
@@ -292,12 +292,12 @@ public class ImitateKeepButton extends View {
                     angleAnimator.start();
             }
 
-            break;
+            return  true;
             case MotionEvent.ACTION_UP: {
                 restoreShape();
             }
             startDrawLine = false;
-            break;
+            return  false;
         }
         return true;
     }
