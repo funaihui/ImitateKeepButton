@@ -26,11 +26,11 @@ import com.example.wizardev.imitatekeepbutton.util.DPUtils;
  * version: 1.0
  */
 public class ImitateKeepButton extends View {
-    private Paint mPaint;
+    private Paint circleBgPaint;
     private Paint textPaint;
     private int mRadius = 200;
-    private Paint circleLinePaint;
-    private Paint arcPaint;
+    private Paint ringBgPaint;
+    private Paint ringPaint;
     private boolean startDrawLine = false;
     private float angle = 0;
     private static final String TAG = "ImitateKeepButton";
@@ -41,77 +41,6 @@ public class ImitateKeepButton extends View {
     private ColorStateList circleColor;
     private ColorStateList textColor;
     private boolean enable = true;
-    public ColorStateList getRingBgColor() {
-        return ringBgColor;
-    }
-
-    public void setRingBgColor(ColorStateList ringBgColor) {
-        this.ringBgColor = ringBgColor;
-    }
-
-    public ColorStateList getRingColor() {
-        return ringColor;
-    }
-
-    public void setRingColor(ColorStateList ringColor) {
-        this.ringColor = ringColor;
-    }
-
-    public ColorStateList getCircleColor() {
-        return circleColor;
-    }
-
-    public void setCircleColor(int circleColor) {
-
-        this.circleColor = ColorStateList.valueOf(circleColor);
-    }
-
-
-
-    public void setTextColor(ColorStateList textColor) {
-        this.textColor = textColor;
-    }
-
-    public String getContentText() {
-        return contentText;
-    }
-
-    public void setContentText(String contentText) {
-        this.contentText = contentText;
-    }
-
-    public int getTextSize() {
-        return textSize;
-    }
-
-    public void setTextSize(int textSize) {
-        this.textSize = textSize;
-    }
-
-    public int getRingSize() {
-        return ringSize;
-    }
-
-    public void setRingSize(int ringSize) {
-        this.ringSize = ringSize;
-    }
-
-    public int getRingRadius() {
-        return ringRadius;
-    }
-
-    public void setRingRadius(int ringRadius) {
-        this.ringRadius = ringRadius;
-    }
-
-    public int getNarrowDown() {
-        return narrowDown;
-    }
-
-    public void setNarrowDown(int narrowDown) {
-        this.narrowDown = narrowDown;
-    }
-
     private String contentText;
     private int textSize;
     private ValueAnimator animator;
@@ -190,22 +119,22 @@ public class ImitateKeepButton extends View {
 
     //初始化画笔及路径
     private void initPaintOrPath() {
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        circleBgPaint = new Paint();
+        circleBgPaint.setAntiAlias(true);
+        circleBgPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
-        circleLinePaint = new Paint();
+        ringBgPaint = new Paint();
 
-        circleLinePaint.setColor(ringBgColor.getColorForState(getDrawableState(),0));
-        circleLinePaint.setAntiAlias(true);
-        circleLinePaint.setStrokeWidth(ringSize);
-        circleLinePaint.setStyle(Paint.Style.STROKE);
+        ringBgPaint.setColor(ringBgColor.getColorForState(getDrawableState(),0));
+        ringBgPaint.setAntiAlias(true);
+        ringBgPaint.setStrokeWidth(ringSize);
+        ringBgPaint.setStyle(Paint.Style.STROKE);
 
-        arcPaint = new Paint();
-        arcPaint.setColor(ringColor.getColorForState(getDrawableState(),0));
-        arcPaint.setAntiAlias(true);
-        arcPaint.setStrokeWidth(ringSize);
-        arcPaint.setStyle(Paint.Style.STROKE);
+        ringPaint = new Paint();
+        ringPaint.setColor(ringColor.getColorForState(getDrawableState(),0));
+        ringPaint.setAntiAlias(true);
+        ringPaint.setStrokeWidth(ringSize);
+        ringPaint.setStyle(Paint.Style.STROKE);
 
         path = new Path();
 
@@ -222,15 +151,15 @@ public class ImitateKeepButton extends View {
         super.onDraw(canvas);
         //画圆
         ringRadius = mRadius - DPUtils.dip2px(getContext(),value/2);
-        mPaint.setColor(circleColor.getColorForState(getDrawableState(),0));
+        circleBgPaint.setColor(circleColor.getColorForState(getDrawableState(),0));
 
-        canvas.drawCircle(getWidth() / 2, getHeight() / 2, ringRadius, mPaint);
+        canvas.drawCircle(getWidth() / 2, getHeight() / 2, ringRadius, circleBgPaint);
         //用户按键时开始画圆环
         if (startDrawLine){
             //计算外环的半径，记得要减去外环的宽度的一半
             result = ringRadius + space +ringSize/2;
             //画完整的进度条
-            canvas.drawCircle(getWidth() / 2, getHeight() / 2, result, circleLinePaint);
+            canvas.drawCircle(getWidth() / 2, getHeight() / 2, result, ringBgPaint);
            //画进度条路径
             path.reset();
             //计算画路径的矩形
@@ -242,7 +171,7 @@ public class ImitateKeepButton extends View {
             path.addArc(rect, -90, angle);
 
             //画圆环的路径
-            canvas.drawPath(path,arcPaint);
+            canvas.drawPath(path, ringPaint);
         }
         canvas.drawText(contentText,getWidth()/2,getHeight()/2,textPaint);
     }
@@ -330,5 +259,14 @@ public class ImitateKeepButton extends View {
     public void setEnabled(boolean enabled) {
        // super.setEnabled(enabled);
         this.enable = enabled;
+    }
+
+    public void setContentText(String contentText) {
+        this.contentText = contentText;
+    }
+    //设置背景颜色
+    public void setCircleColor(int circleColor) {
+
+        this.circleColor = ColorStateList.valueOf(circleColor);
     }
 }
